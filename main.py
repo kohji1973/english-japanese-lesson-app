@@ -141,10 +141,15 @@ if st.session_state.start_flg:
     if st.session_state.mode == ct.MODE_3 and (st.session_state.dictation_button_flg or st.session_state.dictation_count == 0 or st.session_state.dictation_chat_message):
         if st.session_state.dictation_first_flg:
             # 【改善実装】ユーザーレベルに応じた問題生成チェーンを作成
-            current_level = st.session_state.englv
-            level_prompt = ct.SYSTEM_TEMPLATE_CREATE_PROBLEM[current_level]
-            st.session_state.chain_create_problem = ft.create_chain(level_prompt)
-            st.session_state.dictation_first_flg = False
+            # llmが初期化されているか確認
+            if 'llm' in st.session_state:
+                current_level = st.session_state.englv
+                level_prompt = ct.SYSTEM_TEMPLATE_CREATE_PROBLEM[current_level]
+                st.session_state.chain_create_problem = ft.create_chain(level_prompt)
+                st.session_state.dictation_first_flg = False
+            else:
+                st.error("初期化中です。ページをリロードしてください。")
+                st.stop()
         # チャット入力以外
         if not st.session_state.chat_open_flg:
             with st.spinner('問題文生成中...'):
@@ -197,6 +202,10 @@ if st.session_state.start_flg:
     if st.session_state.mode == ct.MODE_1:
         # 【改善実装】ユーザーレベルに応じたチェーンを動的に作成
         # レベルが変更されるたびに、適切なプロンプトでチェーンを再作成
+        if 'llm' not in st.session_state:
+            st.error("初期化中です。ページをリロードしてください。")
+            st.stop()
+        
         current_level = st.session_state.englv
         if st.session_state.chain_basic_conversation is None or \
            not hasattr(st.session_state, 'current_level') or \
@@ -252,10 +261,15 @@ if st.session_state.start_flg:
     if st.session_state.mode == ct.MODE_2 and (st.session_state.shadowing_button_flg or st.session_state.shadowing_count == 0 or st.session_state.shadowing_audio_input_flg):
         if st.session_state.shadowing_first_flg:
             # 【改善実装】ユーザーレベルに応じた問題生成チェーンを作成
-            current_level = st.session_state.englv
-            level_prompt = ct.SYSTEM_TEMPLATE_CREATE_PROBLEM[current_level]
-            st.session_state.chain_create_problem = ft.create_chain(level_prompt)
-            st.session_state.shadowing_first_flg = False
+            # llmが初期化されているか確認
+            if 'llm' in st.session_state:
+                current_level = st.session_state.englv
+                level_prompt = ct.SYSTEM_TEMPLATE_CREATE_PROBLEM[current_level]
+                st.session_state.chain_create_problem = ft.create_chain(level_prompt)
+                st.session_state.shadowing_first_flg = False
+            else:
+                st.error("初期化中です。ページをリロードしてください。")
+                st.stop()
         
         if not st.session_state.shadowing_audio_input_flg:
             with st.spinner('問題文生成中...'):
