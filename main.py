@@ -49,12 +49,22 @@ if "messages" not in st.session_state:
     st.session_state.problem = ""
     
     st.session_state.openai_obj = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-    st.session_state.llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.5)
-    st.session_state.memory = ConversationSummaryBufferMemory(
-        llm=st.session_state.llm,
-        max_token_limit=1000,
-        return_messages=True
-    )
+    st.session_state.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.5)
+    
+    # 【修正】LangChain最新版対応：ConversationSummaryBufferMemoryの初期化
+    # return_messages=Trueでメッセージ形式で履歴を管理
+    try:
+        st.session_state.memory = ConversationSummaryBufferMemory(
+            llm=st.session_state.llm,
+            max_token_limit=1000,
+            return_messages=True
+        )
+    except Exception as e:
+        # フォールバック：シンプルなメモリを使用
+        from langchain.memory import ConversationBufferMemory
+        st.session_state.memory = ConversationBufferMemory(
+            return_messages=True
+        )
 
     # 【改善実装】ユーザーレベルに応じたChain作成
     # 初期化時はデフォルトレベル（中級者）を使用
