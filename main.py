@@ -217,7 +217,11 @@ if st.session_state.start_flg:
             st.stop()
         
         current_level = st.session_state.englv
-        if st.session_state.chain_basic_conversation is None or \
+        
+        # 【修正】chain_basic_conversationの安全なチェック
+        # hasattrを使って属性の存在を確認してからアクセス
+        if not hasattr(st.session_state, 'chain_basic_conversation') or \
+           st.session_state.chain_basic_conversation is None or \
            not hasattr(st.session_state, 'current_level') or \
            st.session_state.current_level != current_level:
             # レベルに応じたプロンプトを選択
